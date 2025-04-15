@@ -1,3 +1,7 @@
 framework:
     mailer:
         dsn: '%env(MAILER_DSN)%'
+        envelope:
+            sender: 'DomainBot <domain@example.com>'
+        headers:
+            From: 'DomainBot <domain@example.com>'

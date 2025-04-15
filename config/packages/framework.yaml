@@ -3,8 +3,22 @@ framework:
     secret: '%env(APP_SECRET)%'
 
     # Note that the session will be started ONLY if you read or write from it.
-    session: true
+    session: 
+        enabled: true
+        cookie_secure: "auto"
+        cookie_samesite: "lax"
 
+    router:
+        default_uri: https://your-domain.com
+
+when@dev:
+    parameters:
+        env(SYMFONY_PROJECT_DEFAULT_ROUTE_URL): "http://localhost"
+
+    framework:
+        router:
+            default_uri: "%env(SYMFONY_PROJECT_DEFAULT_ROUTE_URL)"
+            
     #esi: true
     #fragments: true
 
