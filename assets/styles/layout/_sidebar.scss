@@ -1,0 +1,17 @@
+.with-sidebar {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: var(--sidebar-alignement, center);
+    justify-content: var(--sidebar-justification, center);    
+    column-gap: var(--sidebar-column-gap, 1rem);
+    row-gap: var(--sidebar-row-gap, 1rem);
+
+    .sidebar {
+        flex: var(--sidebar-grow, 0) 1 var(--sidebar-width, 15rem);
+    }
+    
+    .not-sidebar {
+        flex: 999 0 0;
+        min-inline-size: var(--sidebar-not-min-inline-size, 50%);
+    }
+}
