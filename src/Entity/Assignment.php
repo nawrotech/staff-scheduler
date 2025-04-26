@@ -26,6 +26,13 @@ class Assignment
     #[ORM\Column]
     private ?\DateTimeImmutable $assignedAt = null;
 
+    #[ORM\ManyToOne(inversedBy: 'assignments')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?ShiftRole $shiftRole = null;
+
+    #[ORM\Column(length: 20)]
+    private ?string $status = null;
+
 
     public function __construct()
     {
@@ -68,6 +75,30 @@ class Assignment
     public function setAssignedAt(\DateTimeImmutable $assignedAt): static
     {
         $this->assignedAt = $assignedAt;
+
+        return $this;
+    }
+
+    public function getShiftRole(): ?ShiftRole
+    {
+        return $this->shiftRole;
+    }
+
+    public function setShiftRole(?ShiftRole $shiftRole): static
+    {
+        $this->shiftRole = $shiftRole;
+
+        return $this;
+    }
+
+    public function getStatus(): ?string
+    {
+        return $this->status;
+    }
+
+    public function setStatus(string $status): static
+    {
+        $this->status = $status;
 
         return $this;
     }

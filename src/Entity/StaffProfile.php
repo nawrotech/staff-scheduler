@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\StaffPositions;
 use App\Repository\StaffProfileRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -25,7 +26,7 @@ class StaffProfile
     #[ORM\Column(length: 100)]
     private ?string $surname = null;
 
-    #[ORM\Column(length: 50)]
+    #[ORM\Column(enumType: StaffPositions::class)]
     private ?string $position = null;
 
     #[ORM\Column(length: 20)]

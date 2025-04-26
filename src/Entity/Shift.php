@@ -34,9 +34,16 @@ class Shift
     #[ORM\OneToMany(targetEntity: Assignment::class, mappedBy: 'shift', orphanRemoval: true)]
     private Collection $assignments;
 
+    /**
+     * @var Collection<int, ShiftRole>
+     */
+    #[ORM\OneToMany(targetEntity: ShiftRole::class, mappedBy: 'shift')]
+    private Collection $shiftRoles;
+
     public function __construct()
     {
         $this->assignments = new ArrayCollection();
+        $this->shiftRoles = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -116,6 +123,36 @@ class Shift
             // set the owning side to null (unless already changed)
             if ($assignment->getShift() === $this) {
                 $assignment->setShift(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ShiftRole>
+     */
+    public function getShiftRoles(): Collection
+    {
+        return $this->shiftRoles;
+    }
+
+    public function addShiftRole(ShiftRole $shiftRole): static
+    {
+        if (!$this->shiftRoles->contains($shiftRole)) {
+            $this->shiftRoles->add($shiftRole);
+            $shiftRole->setShift($this);
+        }
+
+        return $this;
+    }
+
+    public function removeShiftRole(ShiftRole $shiftRole): static
+    {
+        if ($this->shiftRoles->removeElement($shiftRole)) {
+            // set the owning side to null (unless already changed)
+            if ($shiftRole->getShift() === $this) {
+                $shiftRole->setShift(null);
             }
         }
 
