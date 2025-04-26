@@ -18,7 +18,14 @@
 
         {{ include("partials/flash_messages.html.twig") }}
         
-        {% block body %}{% endblock %}
+        <main>
+            <div class="container">
+                {% block body %}
+                {% endblock %}
+            </div>
+        </main>
+           
+      
         
         {% block footer %}
             {{ include("partials/footer.html.twig") }}

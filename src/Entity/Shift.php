@@ -37,7 +37,7 @@ class Shift
     /**
      * @var Collection<int, ShiftRole>
      */
-    #[ORM\OneToMany(targetEntity: ShiftRole::class, mappedBy: 'shift')]
+    #[ORM\OneToMany(targetEntity: ShiftRole::class, mappedBy: 'shift', orphanRemoval: true, cascade: ['persist'])]
     private Collection $shiftRoles;
 
     public function __construct()
@@ -129,7 +129,7 @@ class Shift
         return $this;
     }
 
-    /**
+        /**
      * @return Collection<int, ShiftRole>
      */
     public function getShiftRoles(): Collection

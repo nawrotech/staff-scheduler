@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Enum\StaffPositions;
+use App\Enum\StaffPosition;
 use App\Repository\StaffProfileRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -16,32 +16,23 @@ class StaffProfile
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\OneToOne(inversedBy: 'staffProfile', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(inversedBy: 'staffProfile')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
     #[ORM\Column(length: 100)]
     private ?string $name = null;
 
-    #[ORM\Column(length: 100)]
-    private ?string $surname = null;
-
-    #[ORM\Column(enumType: StaffPositions::class)]
+    #[ORM\Column(enumType: StaffPosition::class)]
     private ?string $position = null;
 
-    #[ORM\Column(length: 20)]
+    #[ORM\Column(length: 20, nullable: true)]
     private ?string $phone = null;
 
-    /**
-     * @var Collection<int, Assignment>
-     */
-    #[ORM\OneToMany(targetEntity: Assignment::class, mappedBy: 'staffProfile', orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'staff', targetEntity: Assignment::class)]
     private Collection $assignments;
 
-    /**
-     * @var Collection<int, Availability>
-     */
-    #[ORM\OneToMany(targetEntity: Availability::class, mappedBy: 'staffProfile', orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'staff', targetEntity: Availability::class)]
     private Collection $availabilities;
 
     public function __construct()
@@ -79,24 +70,12 @@ class StaffProfile
         return $this;
     }
 
-    public function getSurname(): ?string
-    {
-        return $this->surname;
-    }
-
-    public function setSurname(string $surname): static
-    {
-        $this->surname = $surname;
-
-        return $this;
-    }
-
     public function getPosition(): ?string
     {
         return $this->position;
     }
 
-    public function setPosition(string $position): static
+    public function setPosition(?string $position): static
     {
         $this->position = $position;
 
@@ -108,7 +87,7 @@ class StaffProfile
         return $this->phone;
     }
 
-    public function setPhone(string $phone): static
+    public function setPhone(?string $phone): static
     {
         $this->phone = $phone;
 
@@ -173,5 +152,10 @@ class StaffProfile
         }
 
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->name;
     }
 }

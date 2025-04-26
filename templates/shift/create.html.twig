@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Create shift{% endblock %}
+
+{% block body %}
+
+{{ form_start(form) }}
+    
+    {{ form_row(form.date) }}
+    {{ form_row(form.startTime) }}
+    {{ form_row(form.endTime) }}
+    {{ form_row(form.notes) }}
+    
+    
+    {{ include("partials/_form_collection.html.twig", {
+        collectionType: form.shiftRoles,
+        addButtonText: "Add Roles"
+    }) }}
+{{ form_end(form) }}
+
+{% endblock %}

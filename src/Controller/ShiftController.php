@@ -2,17 +2,85 @@
 
 namespace App\Controller;
 
+use App\Entity\Shift;
+use App\Form\ShiftType;
+use App\Repository\ShiftRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 final class ShiftController extends AbstractController
 {
-    #[Route('/', name: 'app_shift')]
+
+    public function __construct(
+        private ShiftRepository $shiftRepository,
+        private EntityManagerInterface $em
+        )
+    {
+    }
+
+    #[Route('/', name: 'shift_index')]
     public function index(): Response
     {
+        // $shifts = $this->isGranted('ROLE_ADMIN') 
+        //     ? $this->shiftRepository->findAll() 
+        //     : $this->shiftRepository->findBy(['staff' => $this->getUser()]);
+
         return $this->render('shift/index.html.twig', [
             'controller_name' => 'ShiftController',
         ]);
     }
+
+    #[Route('/calendar', name: 'shift_calendar', methods: ['GET'])]
+    public function calendar(ShiftRepository $shiftRepository): Response
+    {
+        $shifts = $this->isGranted('ROLE_ADMIN') 
+            ? $shiftRepository->findAll() 
+            : $shiftRepository->findBy(['staff' => $this->getUser()]);
+            
+        return $this->render('shift/calendar.html.twig', [
+            'shifts' => $shifts,
+        ]);
+    }
+
+    // ADMIN/MANAGER ONLY
+    #[Route('shift/create/{id?}', name: 'shift_new', methods: ['GET', 'POST'])]
+    public function new(
+        Request $request, 
+        Shift $shift
+    ): Response
+    {
+        if (!$shift) {
+            $shift = new Shift();
+        }
+       
+        $form = $this->createForm(ShiftType::class, $shift);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) { 
+            $this->em->persist($shift);
+            $this->em->flush();
+
+            $this->addFlash('success', 'Shift created successfully!');
+
+            return $this->redirectToRoute('shift_index');
+
+        }
+
+        return $this->render('shift/create.html.twig', [
+            'shift' => $shift,
+            'form' => $form,
+        ]);
+    }
+
+
+    // #[Route('/export', name: 'shift_export', methods: ['GET'])]
+    // public function export(ShiftRepository $shiftRepository): Response
+    // {
+    //     // Logic for exporting shifts as CSV or PDF
+    // }
+
+    
 }

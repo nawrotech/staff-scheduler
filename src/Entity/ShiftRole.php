@@ -20,8 +20,8 @@ class ShiftRole
     #[ORM\JoinColumn(nullable: false)]
     private ?Shift $shift = null;
 
-    #[ORM\Column(enumType: StaffPosition::class)]
-    private ?string $roleName = null;
+    #[ORM\Column(type: 'string', enumType: StaffPosition::class)]
+    private ?StaffPosition $roleName = null;
 
     #[ORM\Column]
     private ?int $quantity = null;
@@ -54,12 +54,12 @@ class ShiftRole
         return $this;
     }
 
-    public function getRoleName(): ?string
+    public function getRoleName(): ?StaffPosition
     {
         return $this->roleName;
     }
 
-    public function setRoleName(string $roleName): static
+    public function setRoleName(StaffPosition $roleName): static
     {
         $this->roleName = $roleName;
 

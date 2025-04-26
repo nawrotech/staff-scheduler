@@ -1,0 +1,20 @@
+{% set wrapperClassName = "collection-element-wrapper" %}
+<div {{ stimulus_controller('form-collection') }}
+    data-form-collection-index-value="{{ collectionType|length > 0 ? collectionType|last.vars.name + 1 : 0 }}"
+    data-form-collection-prototype-value="{{ form_widget(collectionType.vars.prototype)|e('html_attr') }}"
+    data-form-collection-wrapper-class-name-value="{{ wrapperClassName }}"
+>
+    <ul {{ stimulus_target('form-collection', 'collectionContainer') }}>
+            {% for formField in collectionType %}
+                <li class="{{ wrapperClassName }}">
+                    {{ form_row(formField) }}
+                </li>
+            {% endfor %}
+    </ul>
+
+    {% if (allowAddingElements is not defined) or (allowAddingElements) %}
+        <button class="btn btn-success" type="button" {{ stimulus_action('form-collection', 'addCollectionElement') }}>
+            {{ addButtonText }}
+        </button>
+    {% endif %}
+</div>

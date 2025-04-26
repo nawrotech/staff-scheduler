@@ -2,7 +2,7 @@
 
 namespace App\Enum;
 
-enum StaffPositions: string
+enum StaffPosition: string
 {
     case WAITER = 'Waiter';
     case CHEF = 'Chef';
