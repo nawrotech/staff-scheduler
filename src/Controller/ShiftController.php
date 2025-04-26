@@ -33,15 +33,15 @@ final class ShiftController extends AbstractController
         ]);
     }
 
-    #[Route('/calendar', name: 'shift_calendar', methods: ['GET'])]
+    #[Route('shift/calendar', name: 'shift_calendar', methods: ['GET'])]
     public function calendar(ShiftRepository $shiftRepository): Response
     {
-        $shifts = $this->isGranted('ROLE_ADMIN') 
-            ? $shiftRepository->findAll() 
-            : $shiftRepository->findBy(['staff' => $this->getUser()]);
+        // $shifts = $this->isGranted('ROLE_ADMIN') 
+        //     ? $shiftRepository->findAll() 
+        //     : $shiftRepository->findBy(['staff' => $this->getUser()]);
             
         return $this->render('shift/calendar.html.twig', [
-            'shifts' => $shifts,
+            // 'shifts' => $shifts,
         ]);
     }
 

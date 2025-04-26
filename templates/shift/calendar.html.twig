@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Shifts calendar{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1 class="my-4">Shift Calendar</h1>
+    
+    <div {{ stimulus_controller('calendar') }}>
+        <div {{ stimulus_target('calendar', 'calendarElement') }}></div>
+    </div>
+</div>
+{% endblock %}
