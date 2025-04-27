@@ -6,7 +6,10 @@
 <div class="container">
     <h1 class="my-4">Shift Calendar</h1>
     
-    <div {{ stimulus_controller('calendar') }}>
+    <div {{ stimulus_controller('calendar', {
+        shiftsUrl: path('api_shifts'),
+        shiftShowUrl: path('shift_show')
+        }) }}>
         <div {{ stimulus_target('calendar', 'calendarElement') }}></div>
     </div>
 </div>
