@@ -31,7 +31,7 @@ final class UserFactory extends PersistentProxyObjectFactory
     {
         return [
             'email' => self::faker()->text(180),
-            'isVerified' => self::faker()->boolean(),
+            'isVerified' => self::faker()->boolean(100),
             'password' => self::faker()->text(),
             'roles' => ['ROLE_USER'],
         ];
@@ -40,11 +40,10 @@ final class UserFactory extends PersistentProxyObjectFactory
     protected function initialize(): static
     {
         return $this
-            ->afterInstantiate(function(User $user) {
+            ->afterInstantiate(function (User $user) {
                 if ($this->passwordHasher !== null) {
                     $user->setPassword($this->passwordHasher->hashPassword($user, $user->getPassword()));
                 }
-            })
-        ;
+            });
     }
 }

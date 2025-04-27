@@ -2,8 +2,13 @@
 
 namespace App\Controller;
 
+use App\Entity\Assignment;
 use App\Entity\Shift;
+use App\Entity\User;
+use App\Enum\AssignmentStatus;
 use App\Form\ShiftType;
+use App\Repository\AssignmentRepository;
+use App\Repository\ShiftPositionRepository;
 use App\Repository\ShiftRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -11,6 +16,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 final class ShiftController extends AbstractController
 {
@@ -18,9 +25,7 @@ final class ShiftController extends AbstractController
     public function __construct(
         private ShiftRepository $shiftRepository,
         private EntityManagerInterface $em
-        )
-    {
-    }
+    ) {}
 
 
     #[Route('/', name: 'shift_index')]
@@ -39,14 +44,14 @@ final class ShiftController extends AbstractController
     #[Route('/api/shifts', name: 'api_shifts', methods: ['GET'])]
     public function getShiftsForCalendar(): JsonResponse
     {
-        $shifts = $this->shiftRepository->findAll(); 
-        
+        $shifts = $this->shiftRepository->findAll();
+
         $events = [];
         foreach ($shifts as $shift) {
             $date = $shift->getDate()->format('Y-m-d');
             $startDateTime = new \DateTimeImmutable($date . ' ' . $shift->getStartTime()->format('H:i:s'));
             $endDateTime = new \DateTimeImmutable($date . ' ' . $shift->getEndTime()->format('H:i:s'));
-            
+
             $events[] = [
                 'id' => $shift->getId(),
                 'title' => 'Shift',
@@ -60,6 +65,60 @@ final class ShiftController extends AbstractController
         return new JsonResponse($events);
     }
 
+    #[IsGranted('ROLE_USER')]
+    #[Route('/shifts/{id}/apply', name: 'assignment_shift_apply', methods: ['POST'])]
+    public function apply(
+        Shift $shift,
+        #[CurrentUser()] User $user,
+        EntityManagerInterface $em,
+        ShiftPositionRepository $shiftPositionRepository,
+        AssignmentRepository $assignmentRepository,
+        Request $request
+    ): Response {
+
+        if (!$user->getStaffProfile()) {
+            $this->addFlash('error', 'You need a staff profile to apply for shifts');
+            return $this->redirectToRoute('shift_details', ['id' => $shift->getId()]);
+        }
+
+        $positionId = $request->getPayload()->get('position_id');
+        $shiftPosition = $shiftPositionRepository->find($positionId);
+
+        if (!$shiftPosition || $shiftPosition->getShift()->getId() !== $shift->getId()) {
+            $this->addFlash('danger', 'Invalid position selected.');
+            return $this->redirectToRoute('shift_show', ['id' => $shift->getId()]);
+        }
+
+        if ($shiftPosition->getName() !== $user->getStaffProfile()->getPosition()) {
+            $this->addFlash('danger', 'You don\'t have required position for that shift!');
+            return $this->redirectToRoute('shift_show', ['id' => $shift->getId()]);
+        }
+
+        $existingAssignment = $assignmentRepository->findOneBy([
+            'shift' => $shift,
+            'staffProfile' => $user->getStaffProfile()
+        ]);
+
+        if ($existingAssignment) {
+            $this->addFlash('warning', 'You have already applied for this shift');
+            return $this->redirectToRoute('shift_show', ['id' => $shift->getId()]);
+        }
+
+        $assignment = new Assignment();
+        $assignment->setShift($shift);
+        $assignment->setShiftPosition($shiftPosition);
+        $assignment->setStaffProfile($user->getStaffProfile());
+        $assignment->setAssignedAt(new \DateTimeImmutable());
+        $assignment->setStatus(AssignmentStatus::PENDING);
+
+        $em->persist($assignment);
+        $em->flush();
+
+        $this->addFlash('success', 'Successfully applied for the shift!');
+        return $this->redirectToRoute('shift_show', ['id' => $shift->getId()]);
+    }
+
+
 
     #[Route('shifts/calendar', name: 'shift_calendar', methods: ['GET'])]
     public function calendar(ShiftRepository $shiftRepository): Response
@@ -67,41 +126,39 @@ final class ShiftController extends AbstractController
         // $shifts = $this->isGranted('ROLE_ADMIN') 
         //     ? $shiftRepository->findAll() 
         //     : $shiftRepository->findBy(['staff' => $this->getUser()]);
-            
+
         return $this->render('shift/calendar.html.twig', [
             // 'shifts' => $shifts,
         ]);
     }
 
-        // ADMIN/MANAGER ONLY
-        #[Route('shifts/create/{id?}', name: 'shift_create', methods: ['GET', 'POST'])]
-        public function create(
-            Request $request, 
-            ?Shift $shift = null
-        ): Response
-        {
-            if (!$shift) {
-                $shift = new Shift();
-            }
-           
-            $form = $this->createForm(ShiftType::class, $shift);
-            $form->handleRequest($request);
-    
-            if ($form->isSubmitted() && $form->isValid()) { 
-                $this->em->persist($shift);
-                $this->em->flush();
-    
-                $this->addFlash('success', 'Shift created successfully!');
-    
-                return $this->redirectToRoute('shift_calendar');
-    
-            }
-    
-            return $this->render('shift/create.html.twig', [
-                'shift' => $shift,
-                'form' => $form,
-            ]);
+    // ADMIN/MANAGER ONLY
+    #[Route('shifts/create/{id?}', name: 'shift_create', methods: ['GET', 'POST'])]
+    public function create(
+        Request $request,
+        ?Shift $shift = null
+    ): Response {
+        if (!$shift) {
+            $shift = new Shift();
         }
+
+        $form = $this->createForm(ShiftType::class, $shift);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->em->persist($shift);
+            $this->em->flush();
+
+            $this->addFlash('success', 'Shift created successfully!');
+
+            return $this->redirectToRoute('shift_calendar');
+        }
+
+        return $this->render('shift/create.html.twig', [
+            'shift' => $shift,
+            'form' => $form,
+        ]);
+    }
 
     #[Route('shifts/{id?}', name: "shift_show")]
     public function showShift(Shift $shift): Response
@@ -113,7 +170,7 @@ final class ShiftController extends AbstractController
         //     : $this->shiftRepository->findBy(['staff' => $this->getUser()]);
 
         return $this->render('shift/details.html.twig', [
-           'shift' => $shift
+            'shift' => $shift
         ]);
     }
 
@@ -126,5 +183,5 @@ final class ShiftController extends AbstractController
     //     // Logic for exporting shifts as CSV or PDF
     // }
 
-    
+
 }

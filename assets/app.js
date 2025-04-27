@@ -7,6 +7,5 @@ import './bootstrap.js';
  */
 // import './styles/app.scss';
 
-// import from './bootstrap';
 import  'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css'

@@ -14,6 +14,7 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
+            # switch_user: true
             lazy: true
             provider: app_user_provider
             form_login:
@@ -31,7 +32,9 @@ security:
             # https://symfony.com/doc/current/security.html#the-firewall
 
             # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
+            switch_user: 
+                role: ROLE_ADMIN
+                # target: app_any_route
 
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used

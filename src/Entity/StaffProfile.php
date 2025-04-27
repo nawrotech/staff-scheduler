@@ -23,8 +23,8 @@ class StaffProfile
     #[ORM\Column(length: 100)]
     private ?string $name = null;
 
-    #[ORM\Column(enumType: StaffPosition::class)]
-    private ?string $position = null;
+    #[ORM\Column(type: 'string', enumType: StaffPosition::class)]
+    private ?StaffPosition $position = null;
 
     #[ORM\Column(length: 20, nullable: true)]
     private ?string $phone = null;
@@ -70,12 +70,12 @@ class StaffProfile
         return $this;
     }
 
-    public function getPosition(): ?string
+    public function getPosition(): ?StaffPosition
     {
         return $this->position;
     }
 
-    public function setPosition(?string $position): static
+    public function setPosition(?StaffPosition $position): static
     {
         $this->position = $position;
 

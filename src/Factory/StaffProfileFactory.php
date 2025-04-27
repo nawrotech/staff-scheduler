@@ -16,9 +16,7 @@ final class StaffProfileFactory extends PersistentProxyObjectFactory
      *
      * @todo inject services if required
      */
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     public static function class(): string
     {
@@ -33,7 +31,7 @@ final class StaffProfileFactory extends PersistentProxyObjectFactory
     protected function defaults(): array|callable
     {
         return [
-            'name' => self::faker()->text(100),
+            'name' => self::faker()->name(),
             'position' => self::faker()->randomElement(StaffPosition::cases()),
             'user' => UserFactory::random(),
             'phone' => self::faker()->phoneNumber()

@@ -11,7 +11,7 @@
                     <h4 class="mb-0 fw-bold text-primary">Shift Details</h4>
                     <div>
                         <span class="badge bg-primary rounded-pill">
-                            {% if shift.date %}{{ shift.date|date('l, F j, Y') }}{% else %}Date not set{% endif %}
+                          {{ shift.date|date('l, F j, Y')|default('Date not set') }}
                         </span>
                     </div>
                 </div>
@@ -56,11 +56,17 @@
                                                 <h6 class="card-title">{{ shiftPosition.name.value }}</h6>
                                                 <p class="card-text small text-muted">{{ shiftPosition.quantity }}</p>
 
-                                                <form method="post" action="{{ path('assignment_shift_apply', {'id': shift.id}) }}">
-                                                    <input type="hidden" name="shift_id" value="{{ shift.id }}">
-                                                    <input type="hidden" name="position_id" value="{{ shiftPosition.id }}">
-                                                    <button type="submit" class="btn btn-primary btn-sm">Apply for Position</button>
-                                                </form>
+
+                                                {% if shiftPosition.name == app.user.staffProfile.position %}
+                                                    <form method="post" action="{{ path('assignment_shift_apply', {'id': shift.id}) }}">
+                                                        <input type="hidden" name="shift_id" value="{{ shift.id }}">
+                                                        <input type="hidden" name="position_id" value="{{ shiftPosition.id }}">
+                                                        <input type="hidden" name="token" value="{{ csrf_token('request_shift') }}">
+                                                        <button type="submit" class="btn btn-primary btn-sm">Apply for Position</button>
+                                                    </form>
+                                                {% endif %}
+                                                
+                                            
 
 
 
@@ -108,8 +114,8 @@
                         {% for assignment in shift.assignments %}
                             <div class="list-group-item d-flex justify-content-between align-items-center">
                                 <div>
-                                    <h6 class="mb-1">{{ assignment.staff.firstName }} {{ assignment.staff.lastName }}</h6>
-                                    <p class="mb-0 small text-muted">{{ assignment.role.name }}</p>
+                                    <h6 class="mb-1">{{ assignment.staffProfile.name }}</h6>
+                                    <p class="mb-0 small text-muted">{{ assignment.shiftPosition.name.value }}</p>
                                 </div>
                                 <span class="badge bg-success rounded-pill">Assigned</span>
                             </div>
