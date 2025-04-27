@@ -47,7 +47,7 @@
                     
                     {% if shift.shiftPositions|length > 0 %}
                         <div class="mb-4">
-                            <h5 class="text-secondary mb-3">Assigned Roles</h5>
+                            <h5 class="text-secondary mb-3">Needed Positions</h5>
                             <div class="row g-3">
                                 {% for shiftPosition in shift.shiftPositions %}
                                     <div class="col-md-6">
@@ -55,6 +55,15 @@
                                             <div class="card-body">
                                                 <h6 class="card-title">{{ shiftPosition.name.value }}</h6>
                                                 <p class="card-text small text-muted">{{ shiftPosition.quantity }}</p>
+
+                                                <form method="post" action="{{ path('assignment_shift_apply', {'id': shift.id}) }}">
+                                                    <input type="hidden" name="shift_id" value="{{ shift.id }}">
+                                                    <input type="hidden" name="position_id" value="{{ shiftPosition.id }}">
+                                                    <button type="submit" class="btn btn-primary btn-sm">Apply for Position</button>
+                                                </form>
+
+
+
                                             </div>
                                         </div>
                                     </div>
@@ -108,6 +117,7 @@
                     </div>
                 </div>
             {% endif %}
+            
         </div>
     </div>
 </div>

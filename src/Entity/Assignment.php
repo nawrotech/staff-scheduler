@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\AssignmentStatus;
 use App\Repository\AssignmentRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -28,10 +29,10 @@ class Assignment
 
     #[ORM\ManyToOne(inversedBy: 'assignments')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?ShiftPosition $shiftRole = null;
+    private ?ShiftPosition $shiftPosition = null;
 
-    #[ORM\Column(length: 20)]
-    private ?string $status = null;
+    #[ORM\Column(type: 'string', enumType: AssignmentStatus::class)]
+    private ?AssignmentStatus $status = null;
 
 
     public function __construct()
@@ -81,22 +82,22 @@ class Assignment
 
     public function getShiftPosition(): ?ShiftPosition
     {
-        return $this->shiftRole;
+        return $this->shiftPosition;
     }
 
-    public function setShiftPosition(?ShiftPosition $shiftRole): static
+    public function setShiftPosition(?ShiftPosition $shiftPosition): static
     {
-        $this->shiftRole = $shiftRole;
+        $this->shiftPosition = $shiftPosition;
 
         return $this;
     }
 
-    public function getStatus(): ?string
+    public function getStatus(): ?AssignmentStatus
     {
         return $this->status;
     }
 
-    public function setStatus(string $status): static
+    public function setStatus(AssignmentStatus $status): static
     {
         $this->status = $status;
 

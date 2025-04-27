@@ -16,7 +16,7 @@ class ShiftPosition
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'shiftRoles')]
+    #[ORM\ManyToOne(inversedBy: 'shiftPositions')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Shift $shift = null;
 

@@ -29,10 +29,10 @@ class StaffProfile
     #[ORM\Column(length: 20, nullable: true)]
     private ?string $phone = null;
 
-    #[ORM\OneToMany(mappedBy: 'staff', targetEntity: Assignment::class)]
+    #[ORM\OneToMany(mappedBy: 'staffProfile', targetEntity: Assignment::class)]
     private Collection $assignments;
 
-    #[ORM\OneToMany(mappedBy: 'staff', targetEntity: Availability::class)]
+    #[ORM\OneToMany(mappedBy: 'staffProfile', targetEntity: Availability::class)]
     private Collection $availabilities;
 
     public function __construct()
