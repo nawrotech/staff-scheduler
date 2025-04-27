@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250426081443 extends AbstractMigration
+final class Version20250427075643 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -22,7 +22,7 @@ final class Version20250426081443 extends AbstractMigration
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql(<<<'SQL'
             CREATE TABLE assignment (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, shift_id INTEGER NOT NULL, staff_profile_id INTEGER NOT NULL, shift_role_id INTEGER NOT NULL, assigned_at DATETIME NOT NULL --(DC2Type:datetime_immutable)
-            , status VARCHAR(20) NOT NULL, CONSTRAINT FK_30C544BABB70BC0E FOREIGN KEY (shift_id) REFERENCES shift (id) NOT DEFERRABLE INITIALLY IMMEDIATE, CONSTRAINT FK_30C544BA2AA80269 FOREIGN KEY (staff_profile_id) REFERENCES staff_profile (id) NOT DEFERRABLE INITIALLY IMMEDIATE, CONSTRAINT FK_30C544BABB521ED5 FOREIGN KEY (shift_role_id) REFERENCES shift_role (id) NOT DEFERRABLE INITIALLY IMMEDIATE)
+            , status VARCHAR(20) NOT NULL, CONSTRAINT FK_30C544BABB70BC0E FOREIGN KEY (shift_id) REFERENCES shift (id) NOT DEFERRABLE INITIALLY IMMEDIATE, CONSTRAINT FK_30C544BA2AA80269 FOREIGN KEY (staff_profile_id) REFERENCES staff_profile (id) NOT DEFERRABLE INITIALLY IMMEDIATE, CONSTRAINT FK_30C544BABB521ED5 FOREIGN KEY (shift_role_id) REFERENCES shift_position (id) NOT DEFERRABLE INITIALLY IMMEDIATE)
         SQL);
         $this->addSql(<<<'SQL'
             CREATE INDEX IDX_30C544BABB70BC0E ON assignment (shift_id)
@@ -64,13 +64,13 @@ final class Version20250426081443 extends AbstractMigration
             , notes CLOB DEFAULT NULL)
         SQL);
         $this->addSql(<<<'SQL'
-            CREATE TABLE shift_role (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, shift_id INTEGER NOT NULL, role_name VARCHAR(50) NOT NULL, quantity INTEGER NOT NULL, CONSTRAINT FK_6250F5A5BB70BC0E FOREIGN KEY (shift_id) REFERENCES shift (id) NOT DEFERRABLE INITIALLY IMMEDIATE)
+            CREATE TABLE shift_position (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, shift_id INTEGER NOT NULL, position VARCHAR(255) NOT NULL, quantity INTEGER NOT NULL, CONSTRAINT FK_6F987C51BB70BC0E FOREIGN KEY (shift_id) REFERENCES shift (id) NOT DEFERRABLE INITIALLY IMMEDIATE)
         SQL);
         $this->addSql(<<<'SQL'
-            CREATE INDEX IDX_6250F5A5BB70BC0E ON shift_role (shift_id)
+            CREATE INDEX IDX_6F987C51BB70BC0E ON shift_position (shift_id)
         SQL);
         $this->addSql(<<<'SQL'
-            CREATE TABLE staff_profile (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, user_id INTEGER NOT NULL, name VARCHAR(100) NOT NULL, surname VARCHAR(100) NOT NULL, position VARCHAR(50) NOT NULL, phone VARCHAR(20) NOT NULL, CONSTRAINT FK_DDE1BDB9A76ED395 FOREIGN KEY (user_id) REFERENCES user (id) NOT DEFERRABLE INITIALLY IMMEDIATE)
+            CREATE TABLE staff_profile (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, user_id INTEGER NOT NULL, name VARCHAR(100) NOT NULL, position VARCHAR(255) NOT NULL, phone VARCHAR(20) DEFAULT NULL, CONSTRAINT FK_DDE1BDB9A76ED395 FOREIGN KEY (user_id) REFERENCES user (id) NOT DEFERRABLE INITIALLY IMMEDIATE)
         SQL);
         $this->addSql(<<<'SQL'
             CREATE UNIQUE INDEX UNIQ_DDE1BDB9A76ED395 ON staff_profile (user_id)
@@ -118,7 +118,7 @@ final class Version20250426081443 extends AbstractMigration
             DROP TABLE shift
         SQL);
         $this->addSql(<<<'SQL'
-            DROP TABLE shift_role
+            DROP TABLE shift_position
         SQL);
         $this->addSql(<<<'SQL'
             DROP TABLE staff_profile

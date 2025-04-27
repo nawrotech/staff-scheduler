@@ -3,13 +3,13 @@
 namespace App\Entity;
 
 use App\Enum\StaffPosition;
-use App\Repository\ShiftRoleRepository;
+use App\Repository\ShiftPositionRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: ShiftRoleRepository::class)]
-class ShiftRole
+#[ORM\Entity(repositoryClass: ShiftPositionRepository::class)]
+class ShiftPosition
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -21,7 +21,7 @@ class ShiftRole
     private ?Shift $shift = null;
 
     #[ORM\Column(type: 'string', enumType: StaffPosition::class)]
-    private ?StaffPosition $roleName = null;
+    private ?StaffPosition $name = null;
 
     #[ORM\Column]
     private ?int $quantity = null;
@@ -29,7 +29,7 @@ class ShiftRole
     /**
      * @var Collection<int, Assignment>
      */
-    #[ORM\OneToMany(targetEntity: Assignment::class, mappedBy: 'shiftRole', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Assignment::class, mappedBy: 'shiftPosition', orphanRemoval: true)]
     private Collection $assignments;
 
     public function __construct()
@@ -54,14 +54,14 @@ class ShiftRole
         return $this;
     }
 
-    public function getRoleName(): ?StaffPosition
+    public function getName(): ?StaffPosition
     {
-        return $this->roleName;
+        return $this->name;
     }
 
-    public function setRoleName(StaffPosition $roleName): static
+    public function setName(StaffPosition $name): static
     {
-        $this->roleName = $roleName;
+        $this->name = $name;
 
         return $this;
     }
@@ -90,7 +90,7 @@ class ShiftRole
     {
         if (!$this->assignments->contains($assignment)) {
             $this->assignments->add($assignment);
-            $assignment->setShiftRole($this);
+            $assignment->setShiftPosition($this);
         }
 
         return $this;
@@ -100,8 +100,8 @@ class ShiftRole
     {
         if ($this->assignments->removeElement($assignment)) {
             // set the owning side to null (unless already changed)
-            if ($assignment->getShiftRole() === $this) {
-                $assignment->setShiftRole(null);
+            if ($assignment->getShiftPosition() === $this) {
+                $assignment->setShiftPosition(null);
             }
         }
 

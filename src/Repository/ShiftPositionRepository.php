@@ -2,22 +2,22 @@
 
 namespace App\Repository;
 
-use App\Entity\ShiftRole;
+use App\Entity\ShiftPosition;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<ShiftRole>
+ * @extends ServiceEntityRepository<ShiftPosition>
  */
-class ShiftRoleRepository extends ServiceEntityRepository
+class ShiftPositionRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, ShiftRole::class);
+        parent::__construct($registry, ShiftPosition::class);
     }
 
     //    /**
-    //     * @return ShiftRole[] Returns an array of ShiftRole objects
+    //     * @return ShiftPosition[] Returns an array of ShiftPosition objects
     //     */
     //    public function findByExampleField($value): array
     //    {
@@ -31,7 +31,7 @@ class ShiftRoleRepository extends ServiceEntityRepository
     //        ;
     //    }
 
-    //    public function findOneBySomeField($value): ?ShiftRole
+    //    public function findOneBySomeField($value): ?ShiftPosition
     //    {
     //        return $this->createQueryBuilder('s')
     //            ->andWhere('s.exampleField = :val')

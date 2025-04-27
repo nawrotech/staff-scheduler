@@ -35,15 +35,15 @@ class Shift
     private Collection $assignments;
 
     /**
-     * @var Collection<int, ShiftRole>
+     * @var Collection<int, ShiftPosition>
      */
-    #[ORM\OneToMany(targetEntity: ShiftRole::class, mappedBy: 'shift', orphanRemoval: true, cascade: ['persist'])]
-    private Collection $shiftRoles;
+    #[ORM\OneToMany(targetEntity: ShiftPosition::class, mappedBy: 'shift', orphanRemoval: true, cascade: ['persist'])]
+    private Collection $shiftPositions;
 
     public function __construct()
     {
         $this->assignments = new ArrayCollection();
-        $this->shiftRoles = new ArrayCollection();
+        $this->shiftPositions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -129,30 +129,30 @@ class Shift
         return $this;
     }
 
-        /**
-     * @return Collection<int, ShiftRole>
+    /**
+     * @return Collection<int, ShiftPosition>
      */
-    public function getShiftRoles(): Collection
+    public function getShiftPositions(): Collection
     {
-        return $this->shiftRoles;
+        return $this->shiftPositions;
     }
 
-    public function addShiftRole(ShiftRole $shiftRole): static
+    public function addShiftPosition(ShiftPosition $shiftPosition): static
     {
-        if (!$this->shiftRoles->contains($shiftRole)) {
-            $this->shiftRoles->add($shiftRole);
-            $shiftRole->setShift($this);
+        if (!$this->shiftPositions->contains($shiftPosition)) {
+            $this->shiftPositions->add($shiftPosition);
+            $shiftPosition->setShift($this);
         }
 
         return $this;
     }
 
-    public function removeShiftRole(ShiftRole $shiftRole): static
+    public function removeShiftPosition(ShiftPosition $shiftPosition): static
     {
-        if ($this->shiftRoles->removeElement($shiftRole)) {
+        if ($this->shiftPositions->removeElement($shiftPosition)) {
             // set the owning side to null (unless already changed)
-            if ($shiftRole->getShift() === $this) {
-                $shiftRole->setShift(null);
+            if ($shiftPosition->getShift() === $this) {
+                $shiftPosition->setShift(null);
             }
         }
 

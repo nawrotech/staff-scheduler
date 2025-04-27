@@ -42,8 +42,8 @@ class ShiftType extends AbstractType
                     'placeholder' => 'Any special instructions or notes for this shift...'
                 ],
             ])
-            ->add('shiftRoles', CollectionType::class, [
-                'entry_type' => ShiftRoleType::class,
+            ->add('shiftPositions', CollectionType::class, [
+                'entry_type' => ShiftPositionType::class,
                 'entry_options' => ['label' => false],
                 'allow_add' => true,
                 'allow_delete' => true,

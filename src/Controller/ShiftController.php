@@ -74,8 +74,8 @@ final class ShiftController extends AbstractController
     }
 
         // ADMIN/MANAGER ONLY
-        #[Route('shifts/create/{id?}', name: 'shift_new', methods: ['GET', 'POST'])]
-        public function new(
+        #[Route('shifts/create/{id?}', name: 'shift_create', methods: ['GET', 'POST'])]
+        public function create(
             Request $request, 
             ?Shift $shift = null
         ): Response
@@ -93,7 +93,7 @@ final class ShiftController extends AbstractController
     
                 $this->addFlash('success', 'Shift created successfully!');
     
-                return $this->redirectToRoute('shift_index');
+                return $this->redirectToRoute('shift_calendar');
     
             }
     
@@ -104,14 +104,16 @@ final class ShiftController extends AbstractController
         }
 
     #[Route('shifts/{id?}', name: "shift_show")]
-    public function showShift(): Response
+    public function showShift(Shift $shift): Response
     {
+        // dd($shift);
+
         // $shifts = $this->isGranted('ROLE_ADMIN') 
         //     ? $this->shiftRepository->findAll() 
         //     : $this->shiftRepository->findBy(['staff' => $this->getUser()]);
 
-        return $this->render('shift/index.html.twig', [
-            'controller_name' => 'ShiftController',
+        return $this->render('shift/details.html.twig', [
+           'shift' => $shift
         ]);
     }
 

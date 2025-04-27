@@ -15,8 +15,6 @@ export default class extends Controller {
     calendar = null;
 
     connect() {
-        console.log(this.shiftShowUrlValue);
-
         this.calendar = new Calendar(this.calendarElementTarget, {
             plugins: [dayGridPlugin, timeGridPlugin, bootstrap5Plugin],
             headerToolbar: {
@@ -44,7 +42,6 @@ export default class extends Controller {
             editable: true,
             height: 'auto'
         });
-        
         this.calendar.render();
     }
 

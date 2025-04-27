@@ -2,7 +2,7 @@
 
 namespace App\Form;
 
-use App\Entity\ShiftRole;
+use App\Entity\ShiftPosition;
 use App\Enum\StaffPosition;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
@@ -14,12 +14,12 @@ use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-class ShiftRoleType extends AbstractType
+class ShiftPositionType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('roleName', EnumType::class, [
+            ->add('name', EnumType::class, [
                 'class' => StaffPosition::class,
                 'label' => 'Position',
                 'required' => true,
@@ -53,7 +53,7 @@ class ShiftRoleType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => ShiftRole::class,
+            'data_class' => ShiftPosition::class,
         ]);
     }
 }

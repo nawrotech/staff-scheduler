@@ -28,7 +28,7 @@ class Assignment
 
     #[ORM\ManyToOne(inversedBy: 'assignments')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?ShiftRole $shiftRole = null;
+    private ?ShiftPosition $shiftRole = null;
 
     #[ORM\Column(length: 20)]
     private ?string $status = null;
@@ -79,12 +79,12 @@ class Assignment
         return $this;
     }
 
-    public function getShiftRole(): ?ShiftRole
+    public function getShiftPosition(): ?ShiftPosition
     {
         return $this->shiftRole;
     }
 
-    public function setShiftRole(?ShiftRole $shiftRole): static
+    public function setShiftPosition(?ShiftPosition $shiftRole): static
     {
         $this->shiftRole = $shiftRole;
 
