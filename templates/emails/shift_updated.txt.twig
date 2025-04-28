@@ -1,0 +1,16 @@
+{# filepath: c:\Users\iza\Desktop\staff-scheduler\templates\emails\shift_updated.txt.twig #}
+Shift Update Notification
+
+Hello {% if recipient_name %}{{ recipient_name }}{% else %}there{% endif %},
+
+Your approved shift for {{ shift_date|date('F j, Y') }} has been updated.
+
+Changes:
+{% for change in changes %}
+* {{ change }}
+{% endfor %}
+
+View Updated Shift Details: {{ shift_url }}
+
+Thank you,
+The Staff Scheduler Team

@@ -10,6 +10,7 @@ use App\Form\ShiftType;
 use App\Repository\AssignmentRepository;
 use App\Repository\ShiftPositionRepository;
 use App\Repository\ShiftRepository;
+use App\Service\ShiftService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -19,6 +20,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted('ROLE_USER')]
 final class ShiftController extends AbstractController
 {
 
@@ -136,6 +138,7 @@ final class ShiftController extends AbstractController
     #[Route('shifts/create/{id?}', name: 'shift_create', methods: ['GET', 'POST'])]
     public function create(
         Request $request,
+        ShiftService $shiftService,
         ?Shift $shift = null
     ): Response {
         if (!$shift) {
@@ -146,8 +149,9 @@ final class ShiftController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->em->persist($shift);
-            $this->em->flush();
+            // dd($shift);
+
+            $shiftService->save($shift);
 
             $this->addFlash('success', 'Shift created successfully!');
 

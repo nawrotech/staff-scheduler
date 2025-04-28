@@ -13,11 +13,11 @@ framework:
 
 when@dev:
     parameters:
-        env(SYMFONY_PROJECT_DEFAULT_ROUTE_URL): "http://localhost"
+        env(SYMFONY_PROJECT_DEFAULT_ROUTE_URL): "http://localhost:8000"
 
     framework:
         router:
-            default_uri: "%env(SYMFONY_PROJECT_DEFAULT_ROUTE_URL)"
+            default_uri: "%env(SYMFONY_PROJECT_DEFAULT_ROUTE_URL)%"
             
     #esi: true
     #fragments: true

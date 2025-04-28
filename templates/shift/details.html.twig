@@ -4,6 +4,7 @@
 
 {% block body %}
 <div class="container py-4">
+  
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card shadow-sm border-0">
@@ -65,10 +66,6 @@
                                                         <button type="submit" class="btn btn-primary btn-sm">Apply for Position</button>
                                                     </form>
                                                 {% endif %}
-                                                
-                                            
-
-
 
                                             </div>
                                         </div>
@@ -123,7 +120,15 @@
                     </div>
                 </div>
             {% endif %}
-            
+
+
+            {% if is_granted('ROLE_ADMIN') %}
+                <a class="btn btn-success" href="{{ path('shift_create', {id: shift.id}) }}">Edit</a>
+
+         
+                <button class="btn btn-danger">Delete</button>
+               
+            {% endif %}
         </div>
     </div>
 </div>

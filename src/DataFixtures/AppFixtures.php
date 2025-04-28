@@ -2,7 +2,7 @@
 
 namespace App\DataFixtures;
 
-use App\Entity\StaffProfile;
+use App\Enum\StaffPosition;
 use App\Factory\StaffProfileFactory;
 use App\Factory\UserFactory;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -12,10 +12,17 @@ class AppFixtures extends Fixture
 {
     public function load(ObjectManager $manager): void
     {
-        UserFactory::createOne([
-            'email' => 'm@n.con',
+        $admin = UserFactory::createOne([
+            'email' => 'm@n.com',
             'password' => '123',
-            'roles' => ['ROLE_ADMIN'],
+            'roles' => ['ROLE_ADMIN', 'ROLE_USER'],
+        ]);
+
+        $adminStaffProfile =  StaffProfileFactory::createOne([
+            'name' => 'Master admin',
+            'user' => $admin,
+            'phone' => '123123123',
+            'position' => StaffPosition::MANAGER
         ]);
 
         $users = UserFactory::createMany(10, function (int $i) {
@@ -34,11 +41,6 @@ class AppFixtures extends Fixture
                 'phone' => '123-456-' . str_pad($i, 4, '0', STR_PAD_LEFT),
             ]);
         }
-
-
-        // $product = new Product();
-        // $manager->persist($product);
-
 
         $manager->flush();
     }

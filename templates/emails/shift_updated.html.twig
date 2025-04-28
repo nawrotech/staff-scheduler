@@ -1,0 +1,19 @@
+    <h1>Shift Update Notification</h1>
+    
+    <p>Hello {% if recipient_name %}{{ recipient_name }}{% else %}there{% endif %},</p>
+    
+    <p>Your approved shift for <strong>{{ shift_date|date('F j, Y') }}</strong> has been updated.</p>
+    
+    <h2>Changes:</h2>
+    <ul>
+    {% for change in changes %}
+        <li>{{ change|raw }}</li>
+    {% endfor %}
+    </ul>
+    
+    <p><a href="{{ shift_url }}">View Updated Shift Details</a></p>
+    
+    <p>
+        Thank you,<br>
+        The Staff Scheduler Team
+    </p>
