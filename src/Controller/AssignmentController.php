@@ -18,6 +18,8 @@ final class AssignmentController extends AbstractController
         ]);
     }
 
+    // #[Route('/assignments/{id}')]
+
 
 
     // #[IsGranted(['ROLE_USER'])

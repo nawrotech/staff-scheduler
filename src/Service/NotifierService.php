@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Notification\ShiftUpdatedNotification;
 use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\Notifier\NotifierInterface;
 use Symfony\Component\Notifier\Recipient\Recipient;
@@ -16,18 +17,10 @@ class NotifierService
         string $shiftUrl,
         string $staffEmail
     ) {
-        $notification = (new Notification('Shift Update: Changes to Your Schedule', ['email']))
-            ->content(sprintf(
-                "Hello %s,\n\nYour shift has been updated with the following changes:\n\n%s\n\nView Details: %s",
-                $staffName,
-                implode("\n", $shiftChanges),
-                $shiftUrl
-            ))
-            ->importance(Notification::IMPORTANCE_MEDIUM);
+        $notification = (new ShiftUpdatedNotification($staffName, $shiftChanges, $shiftUrl));
 
         $this->notifier->send($notification, new Recipient($staffEmail));
     }
-
     public function sendFulfilledShiftNotification(string $shiftId, string $dateString, string $adminEmail)
     {
         $notification = (new Notification('Shift Fully Staffed', ['email']))
