@@ -37,31 +37,7 @@ class ShiftUpdatedHandler
             return;
         }
 
-        $summary = [];
-        foreach ($message->getChangeSet() as $field => [$old, $new]) {
-            if ($old instanceof \DateTimeInterface) {
-                $oldStr = $field === 'date'
-                    ? $old->format('Y-m-d')
-                    : $old->format('H:i');
-            } else {
-                $oldStr = (string)$old;
-            }
-
-            if ($new instanceof \DateTimeInterface) {
-                $newStr = $field === 'date'
-                    ? $new->format('Y-m-d')
-                    : $new->format('H:i');
-            } else {
-                $newStr = (string)$new;
-            }
-
-            $summary[] = sprintf(
-                '%s: %s → %s',
-                ucfirst($field),
-                $oldStr,
-                $newStr
-            );
-        }
+        $summary = $this->formatChanges($message->getChangeSet());
 
         $shiftUrl = $this->router->generate(
             'shift_show',
@@ -76,10 +52,59 @@ class ShiftUpdatedHandler
             $this->mailerService->sendShiftUpdatedEmail(
                 $user->getEmail(),
                 $staffName,
-                $summary,
+                $summary['changes'],
                 $shiftUrl,
-                $shift->getDate() // TO DO OLD DATE SHOULD BE DISPLAYED IF EXISTS
+                $summary['originalDate'] ?? $shift->getDate()
             );
         }
+    }
+
+    private function formatChanges(array $changeSet): array
+    {
+        $summary = [];
+        $originalDate = null;
+
+        foreach ($changeSet as $field => [$old, $new]) {
+            if ($field === 'date' && $old instanceof \DateTimeInterface) {
+                $originalDate = $old;
+            }
+
+            $summary[] = $this->createChangeSummary($field, $old, $new);
+        }
+
+        return [
+            'changes' => $summary,
+            'originalDate' => $originalDate
+        ];
+    }
+
+    private function createChangeSummary(string $field, $old, $new): string
+    {
+        return sprintf(
+            '%s: %s → %s',
+            ucfirst($field),
+            $this->formatValue($old),
+            $this->formatValue($new)
+        );
+    }
+
+    private function formatValue(mixed $value): string
+    {
+        if (!$value instanceof \DateTimeInterface) {
+            return (string)$value;
+        }
+
+        $isTimeOnly = $value->format('Y-m-d') === '1970-01-01';
+        $isDateOnly = $value->format('H:i:s') === '00:00:00';
+
+        if ($isTimeOnly) {
+            return $value->format('H:i');
+        }
+
+        if ($isDateOnly) {
+            return $value->format('Y-m-d');
+        }
+
+        return $value->format('Y-m-d H:i');
     }
 }
