@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Dto\ShiftCalendarEventDto;
 use App\Entity\Assignment;
 use App\Entity\Shift;
 use App\Entity\User;
@@ -10,6 +11,7 @@ use App\Form\ShiftType;
 use App\Repository\AssignmentRepository;
 use App\Repository\ShiftPositionRepository;
 use App\Repository\ShiftRepository;
+use App\Repository\UserRepository;
 use App\Service\ShiftService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -48,29 +50,20 @@ final class ShiftController extends AbstractController
     {
         $shifts = $this->shiftRepository->findAll();
 
-        $events = [];
-        foreach ($shifts as $shift) {
-            $date = $shift->getDate()->format('Y-m-d');
-            $startDateTime = new \DateTimeImmutable($date . ' ' . $shift->getStartTime()->format('H:i:s'));
-            $endDateTime = new \DateTimeImmutable($date . ' ' . $shift->getEndTime()->format('H:i:s'));
+        $events = array_map(
+            fn(Shift $shift) => ShiftCalendarEventDto::fromShift($shift)->toArray(),
+            $shifts
+        );
 
-            $events[] = [
-                'id' => $shift->getId(),
-                'title' => 'Shift',
-                'start' => $startDateTime->format('Y-m-d\TH:i:s'),
-                'end' => $endDateTime->format('Y-m-d\TH:i:s'),
-                'extendedProps' => [
-                    'notes' => $shift->getNotes()
-                ]
-            ];
-        }
         return new JsonResponse($events);
     }
 
+    // csrf token check
     #[IsGranted('ROLE_USER')]
     #[Route('/shifts/{id}/apply', name: 'assignment_shift_apply', methods: ['POST'])]
     public function apply(
         Shift $shift,
+        ShiftService $shiftService,
         #[CurrentUser()] User $user,
         EntityManagerInterface $em,
         ShiftPositionRepository $shiftPositionRepository,
@@ -116,6 +109,8 @@ final class ShiftController extends AbstractController
         $em->persist($assignment);
         $em->flush();
 
+        $shiftService->checkAndDispatchShiftFulfilled($shift);
+
         $this->addFlash('success', 'Successfully applied for the shift!');
         return $this->redirectToRoute('shift_show', ['id' => $shift->getId()]);
     }
@@ -125,16 +120,10 @@ final class ShiftController extends AbstractController
     #[Route('shifts/calendar', name: 'shift_calendar', methods: ['GET'])]
     public function calendar(ShiftRepository $shiftRepository): Response
     {
-        // $shifts = $this->isGranted('ROLE_ADMIN') 
-        //     ? $shiftRepository->findAll() 
-        //     : $shiftRepository->findBy(['staff' => $this->getUser()]);
-
-        return $this->render('shift/calendar.html.twig', [
-            // 'shifts' => $shifts,
-        ]);
+        return $this->render('shift/calendar.html.twig', []);
     }
 
-    // ADMIN/MANAGER ONLY
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('shifts/create/{id?}', name: 'shift_create', methods: ['GET', 'POST'])]
     public function create(
         Request $request,
@@ -149,8 +138,6 @@ final class ShiftController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // dd($shift);
-
             $shiftService->save($shift);
 
             $this->addFlash('success', 'Shift created successfully!');
@@ -165,20 +152,17 @@ final class ShiftController extends AbstractController
     }
 
     #[Route('shifts/{id?}', name: "shift_show")]
-    public function showShift(Shift $shift): Response
-    {
-        // dd($shift);
+    public function showShift(
+        Shift $shift,
+        UserRepository $userRepository
+    ): Response {
 
-        // $shifts = $this->isGranted('ROLE_ADMIN') 
-        //     ? $this->shiftRepository->findAll() 
-        //     : $this->shiftRepository->findBy(['staff' => $this->getUser()]);
+        // dd($userRepository->findByRole('ROLE_USER'));
 
         return $this->render('shift/details.html.twig', [
             'shift' => $shift
         ]);
     }
-
-
 
 
     // #[Route('/export', name: 'shift_export', methods: ['GET'])]
