@@ -2,11 +2,10 @@
 
 namespace App\MessageHandler;
 
-use App\Enum\AssignmentStatus;
 use App\Message\ShiftUpdatedMessage;
 use App\Repository\AssignmentRepository;
 use App\Repository\ShiftRepository;
-use App\Service\MailerService;
+use App\Service\NotifierService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -19,7 +18,7 @@ class ShiftUpdatedHandler
         private ShiftRepository $shifts,
         private UrlGeneratorInterface $router,
         private AssignmentRepository $assignmentRepository,
-        private MailerService $mailerService
+        private NotifierService $notifierService
     ) {}
 
     public function __invoke(ShiftUpdatedMessage $message): void
@@ -27,13 +26,12 @@ class ShiftUpdatedHandler
         $shift = $this->shifts->find($message->getShiftId());
         if (!$shift) return;
 
-        $approved = $this->assignmentRepository
+        $assignments = $this->assignmentRepository
             ->findBy([
                 'shift'  => $shift,
-                'status' => AssignmentStatus::APPROVED
             ]);
 
-        if (empty($approved)) {
+        if (empty($assignments)) {
             return;
         }
 
@@ -45,16 +43,15 @@ class ShiftUpdatedHandler
             UrlGeneratorInterface::ABSOLUTE_URL
         );
 
-        foreach ($approved as $assignment) {
-            $user = $assignment->getStaffProfile()->getUser();
+        foreach ($assignments as $assignment) {
+            $staffEmail = $assignment->getStaffProfile()->getUser()->getEmail();
             $staffName = $assignment->getStaffProfile()->getName();
 
-            $this->mailerService->sendShiftUpdatedEmail(
-                $user->getEmail(),
+            $this->notifierService->sendShiftUpdatedNotification(
                 $staffName,
                 $summary['changes'],
                 $shiftUrl,
-                $summary['originalDate'] ?? $shift->getDate()
+                $staffEmail
             );
         }
     }

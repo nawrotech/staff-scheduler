@@ -2,7 +2,11 @@
 
 namespace App\DataFixtures;
 
+use App\Enum\AssignmentStatus;
 use App\Enum\StaffPosition;
+use App\Factory\AssignmentFactory;
+use App\Factory\ShiftFactory;
+use App\Factory\ShiftPositionFactory;
 use App\Factory\StaffProfileFactory;
 use App\Factory\UserFactory;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -12,35 +16,107 @@ class AppFixtures extends Fixture
 {
     public function load(ObjectManager $manager): void
     {
+        // 1. Create a small set of predictable users
         $admin = UserFactory::createOne([
             'email' => 'm@n.com',
             'password' => '123',
             'roles' => ['ROLE_ADMIN', 'ROLE_USER'],
         ]);
 
-        $adminStaffProfile =  StaffProfileFactory::createOne([
-            'name' => 'Master admin',
+        $chef = UserFactory::createOne([
+            'email' => 'chef@example.com',
+            'password' => '123',
+            'roles' => ['ROLE_USER'],
+        ]);
+
+        $waiter = UserFactory::createOne([
+            'email' => 'waiter@example.com',
+            'password' => '123',
+            'roles' => ['ROLE_USER'],
+        ]);
+
+        // 2. Create staff profiles with clear positions
+        $adminProfile = StaffProfileFactory::createOne([
+            'name' => 'Admin Manager',
             'user' => $admin,
-            'phone' => '123123123',
+            'phone' => '123-456-7890',
             'position' => StaffPosition::MANAGER
         ]);
 
-        $users = UserFactory::createMany(10, function (int $i) {
-            return [
-                'email' => 'user' . $i . '@example.com',
-                'password' => '123',
-                'roles' => ['ROLE_USER'],
-            ];
-        });
+        $chefProfile = StaffProfileFactory::createOne([
+            'name' => 'Head Chef',
+            'user' => $chef,
+            'phone' => '123-456-7891',
+            'position' => StaffPosition::CHEF
+        ]);
 
+        $waiterProfile = StaffProfileFactory::createOne([
+            'name' => 'Senior Waiter',
+            'user' => $waiter,
+            'phone' => '123-456-7892',
+            'position' => StaffPosition::WAITER
+        ]);
 
-        foreach ($users as $i => $userProxy) {
-            StaffProfileFactory::createOne([
-                'name' => 'Staff ' . $i,
-                'user' => $userProxy,
-                'phone' => '123-456-' . str_pad($i, 4, '0', STR_PAD_LEFT),
-            ]);
-        }
+        // 3. Create a test shift with clearly defined positions
+        $testShift = ShiftFactory::createOne([
+            'date' => new \DateTimeImmutable('next Monday'),
+            'startTime' => new \DateTimeImmutable('10:00'),
+            'endTime' => new \DateTimeImmutable('18:00'),
+            'notes' => 'Test Shift for Email Notifications'
+        ]);
+
+        // 4. Create positions for the shift
+        $chefPosition = ShiftPositionFactory::createOne([
+            'shift' => $testShift,
+            'name' => StaffPosition::CHEF,
+            'quantity' => 1 // Need exactly 1 chef
+        ]);
+
+        $waiterPosition = ShiftPositionFactory::createOne([
+            'shift' => $testShift,
+            'name' => StaffPosition::WAITER,
+            'quantity' => 1 // Need exactly 1 waiter
+        ]);
+
+        // 5. Assign staff to positions
+        AssignmentFactory::createOne([
+            'shift' => $testShift,
+            'shiftPosition' => $chefPosition,
+            'staffProfile' => $chefProfile,
+            'status' => AssignmentStatus::PENDING,
+            'assignedAt' => new \DateTimeImmutable('now')
+        ]);
+
+        AssignmentFactory::createOne([
+            'shift' => $testShift,
+            'shiftPosition' => $waiterPosition,
+            'staffProfile' => $waiterProfile,
+            'status' => AssignmentStatus::PENDING,
+            'assignedAt' => new \DateTimeImmutable('now')
+        ]);
+
+        // 6. Create a second shift that can be used to test updates
+        $updateShift = ShiftFactory::createOne([
+            'date' => new \DateTimeImmutable('next Tuesday'),
+            'startTime' => new \DateTimeImmutable('09:00'),
+            'endTime' => new \DateTimeImmutable('17:00'),
+            'notes' => 'Shift to Test Updates'
+        ]);
+
+        $updateChefPosition = ShiftPositionFactory::createOne([
+            'shift' => $updateShift,
+            'name' => StaffPosition::CHEF,
+            'quantity' => 1
+        ]);
+
+        // Assign the chef to this shift too
+        AssignmentFactory::createOne([
+            'shift' => $updateShift,
+            'shiftPosition' => $updateChefPosition,
+            'staffProfile' => $chefProfile,
+            'status' => AssignmentStatus::PENDING,
+            'assignedAt' => new \DateTimeImmutable('now')
+        ]);
 
         $manager->flush();
     }

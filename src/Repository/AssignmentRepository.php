@@ -3,6 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\Assignment;
+use App\Entity\Shift;
+use App\Enum\AssignmentStatus;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -14,6 +16,22 @@ class AssignmentRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Assignment::class);
+    }
+
+    public function getPositionCountsForShift(Shift $shift, AssignmentStatus $status): array
+    {
+        $results = $this->createQueryBuilder('a')
+            ->select('sp.id as positionId, COUNT(a.id) as count')
+            ->join('a.shiftPosition', 'sp')
+            ->where('a.shift = :shift')
+            ->andWhere('a.status = :status')
+            ->setParameter('shift', $shift)
+            ->setParameter('status', $status)
+            ->groupBy('sp.id')
+            ->getQuery()
+            ->getResult();
+
+        return array_column($results, 'count', 'positionId');
     }
 
     //    /**
