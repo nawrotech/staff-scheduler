@@ -43,8 +43,11 @@
                                 {% set assignmentStatuses = enum('App\\Enum\\AssignmentStatus').cases() %} 
                                 
                                 <form method="post" 
-                                {# action="{{ path('admin_assignment_update_status', {'id': assignment.id}) }}" #}
-                                    class="d-inline-flex align-items-center me-2">
+                                    action="{{ path('admin_assignment_update_status', {'id': assignment.id}) }}"
+                                    class="d-inline-flex align-items-center me-2"
+                                    >
+                                    <input type="hidden" name="token" value="{{ csrf_token('update-assignment-' ~ assignment.id) }}">
+
                                     <select name="status" class="form-select form-select-sm me-2" style="width: auto;">
                                         {% for statusCase in assignmentStatuses %}
                                             <option value="{{ statusCase.value }}" {{ assignment.status == statusCase ? 'selected' : '' }}>
@@ -56,6 +59,7 @@
                                         <i class="bi bi-check-lg"></i> Save
                                     </button>
                                 </form>
+
                                 <form method="DELETE" 
                                     action="{{ path('admin_assignment_delete', {'id': assignment.id}) }}"
                                     class="d-inline">
