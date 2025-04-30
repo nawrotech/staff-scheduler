@@ -1,0 +1,20 @@
+<form method="post" 
+    action="{{ path('admin_assignment_update_status', {'id': assignment.id}) }}"
+    class="d-inline-flex align-items-center me-2">
+
+    <input type="hidden" name="token" value="{{ csrf_token('update-assignment-' ~ assignment.id) }}"> 
+
+    <label class="visually-hidden" for="status">Select status for change</label>
+    {{ include('partials/_select.html.twig', {
+        name: 'status',
+        options:  enum('App\\Enum\\AssignmentStatus').cases(),
+        additionalClass: 'form-select-sm me-2 w-auto',
+        selectedValue: assignment.status.value, 
+        includePlaceholder: true,
+        placeholderText: '-- Change status to --'
+    }) }}
+
+    <button type="submit" class="btn btn-sm btn-outline-success">
+        <i class="bi bi-check-lg"></i> Save
+    </button>
+</form>

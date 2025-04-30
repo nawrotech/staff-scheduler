@@ -1,0 +1,27 @@
+<li class="list-group-item d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center">
+        
+        <input type="checkbox" 
+               name="assignment_ids[]" 
+               value="{{ assignment.id }}" 
+               form="bulk-action-form" 
+               class="form-check-input me-2" 
+               aria-label="Select assignment {{ assignment.id }}">
+        
+        <div>
+            {% if assignment.staffProfile %}
+                <span class="fw-bold">{{ assignment.staffProfile.name }}</span>
+                <span>{{ assignment.staffProfile.position.value }}</span>
+            {% else %}
+                <span class="text-muted fst-italic">Unassigned</span>
+            {% endif %}
+        </div>
+    </div>
+    
+
+    <div class="d-flex align-items-center">
+        {{ include('shift/_update_assignment_status_form.html.twig') }}
+
+        {{ include('shift/_delete_assignment_form.html.twig') }}
+    </div>
+</li>

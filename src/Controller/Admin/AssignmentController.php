@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\Assignment;
 use App\Enum\AssignmentStatus;
+use App\Repository\AssignmentRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\ExpressionLanguage\Expression;
@@ -51,6 +52,58 @@ final class AssignmentController extends AbstractController
         return $this->redirectToRoute('admin_shift_manage', [
             'id' => $assignment->getShift()->getId()
         ]);
+    }
+
+    #[Route('/assignments/bulk-update-status/{shiftId}', name: 'admin_assignment_bulk_update_status', methods: ['POST'])]
+    #[IsCsrfTokenValid('bulk-update-status', tokenKey: 'token')]
+    public function bulkUpdateStatus(
+        Request $request,
+        EntityManagerInterface $em,
+        AssignmentRepository $assignmentRepository,
+        int $shiftId
+    ): Response {
+        $submittedData = $request->getPayload();
+        $assignmentIds = $submittedData->all('assignment_ids');
+
+        $bulkStatusValue = $submittedData->get('bulk_status');
+
+        if (empty($assignmentIds)) {
+            $this->addFlash('warning', 'No assignments selected for bulk update.');
+            return $this->redirectToRoute('admin_shift_manage', ['id' => $shiftId]);
+        }
+
+        if (null === $bulkStatusValue) {
+            $this->addFlash('error', 'No bulk status selected.');
+            return $this->redirectToRoute('admin_shift_manage', ['id' => $shiftId]);
+        }
+
+        $newStatus = AssignmentStatus::tryFrom($bulkStatusValue);
+
+        if (null === $newStatus) {
+            $this->addFlash('error', sprintf('Invalid bulk status value "%s" provided.', $bulkStatusValue));
+            return $this->redirectToRoute('admin_shift_manage', ['id' => $shiftId]);
+        }
+
+        $assignmentsToUpdate = $assignmentRepository->findBy(['id' => $assignmentIds]);
+
+        $updatedCount = 0;
+        foreach ($assignmentsToUpdate as $assignment) {
+            if ($assignment->getShift()?->getId() == $shiftId) {
+                $assignment->setStatus($newStatus);
+                $updatedCount++;
+            } else {
+                $this->addFlash('warning', sprintf('Assignment ID %d does not belong to this shift and was skipped.', $assignment->getId()));
+            }
+        }
+
+        if ($updatedCount > 0) {
+            $em->flush();
+            $this->addFlash('success', sprintf('%d assignment statuses updated successfully to "%s".', $updatedCount, $newStatus->value));
+        } else {
+            $this->addFlash('warning', 'No assignments were updated. They might not belong to this shift or were already in the target state.');
+        }
+
+        return $this->redirectToRoute('admin_shift_manage', ['id' => $shiftId]);
     }
 
     #[Route('/assignment/{id}', name: 'admin_assignment_delete', methods: ['DELETE'])]

@@ -1,0 +1,26 @@
+<form method="post" 
+    action="{{ path('admin_assignment_bulk_update_status', {'shiftId': shift.id}) }}" 
+    id="bulk-action-form" 
+    class="mb-3 p-3 border rounded bg-light">
+    <input type="hidden" name="token" value="{{ csrf_token('bulk-update-status') }}">
+    <div class="row g-2 align-items-end">
+    <div class="col-auto">
+        <label for="bulk_status" class="form-label">Bulk Action:</label>
+        {% set assignmentStatuses = enum('App\\Enum\\AssignmentStatus').cases() %}
+        
+        {{ include('partials/_select.html.twig', {
+            name: 'bulk_status',
+            options:  enum('App\\Enum\\AssignmentStatus').cases(),
+            additionalClass: 'form-select-sm me-2',
+            selectedValue: null, 
+            includePlaceholder: true,
+            placeholderText: '-- Change status to --'
+        }) }}
+                        
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-sm btn-primary">Apply to Selected</button>
+    </div>
+    </div>
+    <small class="form-text text-muted">Select assignments below before applying.</small>
+</form> 

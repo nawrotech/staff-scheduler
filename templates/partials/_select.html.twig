@@ -1,0 +1,27 @@
+{% set select_id = id|default(name) %}
+{% set select_required = required|default(false) %}
+{% set select_base_class = baseClass|default('form-select') %}
+{% set select_additional_class = additionalClass|default('') %} 
+{% set select_placeholder = includePlaceholder|default(false) %}
+{% set select_placeholder_text = placeholderText|default('-- Select Something --') %}
+
+
+<select name="{{ name }}"
+        id="{{ select_id }}"
+        class="{{ select_base_class }} {{ select_additional_class }}" 
+        {% if select_required %}required{% endif %}
+        >
+
+        {% if select_placeholder %}
+            <option value="">
+                {{ select_placeholder_text }}
+            </option>
+        {% endif %}
+        
+        {% for option in options %}
+            <option value="{{ option.value }}" 
+                    {{ (selectedValue is not null and option.value == selectedValue) ? 'selected' : '' }}
+              > {{ option.value }}
+            </option>
+        {% endfor %}
+</select>

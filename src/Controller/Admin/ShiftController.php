@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Assignment;
 use App\Entity\Shift;
 use App\Repository\AssignmentRepository;
 use App\Service\NotifierService;
@@ -32,6 +33,11 @@ class ShiftController extends AbstractController
             $positionName = $assignment->getShiftPosition()?->getName() ?? 'Unassigned';
             $assignmentsByPosition[$positionName->value][] = $assignment;
         }
+
+        // $assignmentsByPosition = array_reduce($shiftAssignments, function ($carry, Assignment $assignment) {
+        //     $positionName = $assignment->getShiftPosition()?->getName() ?? 'Unassigned';
+        //     $assignmentsByPosition[$positionName->value][] = $assignment;
+        // }, []);
 
 
         return $this->render('admin/shift/manage.html.twig', [
