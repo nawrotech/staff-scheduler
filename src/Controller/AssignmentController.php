@@ -10,7 +10,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class AssignmentController extends AbstractController
 {
-    #[Route('/assignment', name: 'app_assignment')]
+    #[Route('/assignment', name: 'app_assignmsfsfsdsfent')]
     public function index(): Response
     {
         return $this->render('assignment/index.html.twig', [

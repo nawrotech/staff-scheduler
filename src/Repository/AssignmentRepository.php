@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Assignment;
 use App\Entity\Shift;
+use App\Entity\ShiftPosition;
 use App\Enum\AssignmentStatus;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -33,6 +34,22 @@ class AssignmentRepository extends ServiceEntityRepository
 
         return array_column($results, 'count', 'positionId');
     }
+
+    /**
+     * Counts the number of assignments with 'Approved' status for a specific ShiftPosition.
+     */
+    public function countApprovedByShiftPosition(ShiftPosition $shiftPosition): int
+    {
+        return $this->createQueryBuilder('a')
+            ->select('count(a.id)')
+            ->andWhere('a.shiftPosition = :shiftPosition')
+            ->andWhere('a.status = :status')
+            ->setParameter('shiftPosition', $shiftPosition)
+            ->setParameter('status', AssignmentStatus::APPROVED)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
 
     //    /**
     //     * @return Assignment[] Returns an array of Assignment objects

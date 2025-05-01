@@ -23,8 +23,14 @@ class AppFixtures extends Fixture
             'roles' => ['ROLE_ADMIN', 'ROLE_USER'],
         ]);
 
-        $chef = UserFactory::createOne([
-            'email' => 'chef@example.com',
+        $chef1 = UserFactory::createOne([
+            'email' => 'chef1@example.com',
+            'password' => '123',
+            'roles' => ['ROLE_USER'],
+        ]);
+
+        $chef2 = UserFactory::createOne([
+            'email' => 'chef2@example.com',
             'password' => '123',
             'roles' => ['ROLE_USER'],
         ]);
@@ -43,9 +49,16 @@ class AppFixtures extends Fixture
             'position' => StaffPosition::MANAGER
         ]);
 
-        $chefProfile = StaffProfileFactory::createOne([
+        $chefProfile1 = StaffProfileFactory::createOne([
             'name' => 'Head Chef',
-            'user' => $chef,
+            'user' => $chef1,
+            'phone' => '123-456-7891',
+            'position' => StaffPosition::CHEF
+        ]);
+
+        $chefProfile2 = StaffProfileFactory::createOne([
+            'name' => 'Head Chef',
+            'user' => $chef2,
             'phone' => '123-456-7891',
             'position' => StaffPosition::CHEF
         ]);
@@ -69,7 +82,7 @@ class AppFixtures extends Fixture
         $chefPosition = ShiftPositionFactory::createOne([
             'shift' => $testShift,
             'name' => StaffPosition::CHEF,
-            'quantity' => 1 // Need exactly 1 chef
+            'quantity' => 1
         ]);
 
         $waiterPosition = ShiftPositionFactory::createOne([
@@ -82,7 +95,15 @@ class AppFixtures extends Fixture
         AssignmentFactory::createOne([
             'shift' => $testShift,
             'shiftPosition' => $chefPosition,
-            'staffProfile' => $chefProfile,
+            'staffProfile' => $chefProfile1,
+            'status' => AssignmentStatus::PENDING,
+            'assignedAt' => new \DateTimeImmutable('now')
+        ]);
+
+        AssignmentFactory::createOne([
+            'shift' => $testShift,
+            'shiftPosition' => $chefPosition,
+            'staffProfile' => $chefProfile2,
             'status' => AssignmentStatus::PENDING,
             'assignedAt' => new \DateTimeImmutable('now')
         ]);
@@ -109,11 +130,11 @@ class AppFixtures extends Fixture
             'quantity' => 1
         ]);
 
-        // Assign the chef to this shift too
+        // Assign the chef1 to this shift too
         AssignmentFactory::createOne([
             'shift' => $updateShift,
             'shiftPosition' => $updateChefPosition,
-            'staffProfile' => $chefProfile,
+            'staffProfile' => $chefProfile1,
             'status' => AssignmentStatus::PENDING,
             'assignedAt' => new \DateTimeImmutable('now')
         ]);

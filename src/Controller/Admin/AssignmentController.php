@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\Assignment;
 use App\Enum\AssignmentStatus;
 use App\Repository\AssignmentRepository;
+use App\Validator\AssignmentApprovalLimit;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\ExpressionLanguage\Expression;
@@ -12,12 +13,26 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 final class AssignmentController extends AbstractController
 {
-    #[Route('/assignment', name: 'app_assignment')]
-    public function index(): Response
-    {
+    #[Route('/assignment/check/fucking/{id}', name: 'app_assignment')]
+    public function index(
+        Assignment $assignment,
+        EntityManagerInterface $em
+    ): Response {
+
+        // dd($assignment);
+
+        $assignment->setStatus(AssignmentStatus::PENDING);
+
+        $uow = $em->getUnitOfWork();
+        $originalData = $uow->getOriginalEntityData($assignment);
+
+        dd($assignment, $originalData['status']);
+
+
         return $this->render('assignment/index.html.twig', [
             'controller_name' => 'AssignmentController',
         ]);
@@ -28,10 +43,15 @@ final class AssignmentController extends AbstractController
     public function update(
         Assignment $assignment,
         EntityManagerInterface $em,
-        Request $request
+        Request $request,
+        ValidatorInterface $validator
     ): Response {
 
         $submittedStatusValue = $request->getPayload()->get('status');
+
+        $redirectRoute = 'admin_shift_manage';
+        $redirectParams = ['id' => $assignment->getShift()?->getId() ?? 0];
+
 
         if (null === $submittedStatusValue) {
             $this->addFlash('error', 'Status value not provided.');
@@ -44,11 +64,23 @@ final class AssignmentController extends AbstractController
             $this->addFlash('error', sprintf('Invalid status value "%s" provided.', $submittedStatusValue));
             return $this->redirectToRoute('admin_shift_manage', ['id' => $assignment->getShift()?->getId()]);
         }
+
         $assignment->setStatus($newStatus);
+
+        $violations = $validator->validate($assignment, [
+            new AssignmentApprovalLimit()
+        ]);
+
+        if (count($violations) > 0) {
+            foreach ($violations as $violation) {
+                $this->addFlash('danger', $violation->getMessage());
+            }
+            return $this->redirectToRoute($redirectRoute, $redirectParams);
+        }
+
         $em->flush();
 
         $this->addFlash('success', 'Assignment status updated successfully.');
-
         return $this->redirectToRoute('admin_shift_manage', [
             'id' => $assignment->getShift()->getId()
         ]);

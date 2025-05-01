@@ -39,7 +39,6 @@ class ShiftController extends AbstractController
         //     $assignmentsByPosition[$positionName->value][] = $assignment;
         // }, []);
 
-
         return $this->render('admin/shift/manage.html.twig', [
             'shift' => $shift,
             'assignmentsByPosition' => $assignmentsByPosition
