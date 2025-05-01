@@ -92,6 +92,7 @@ final class AssignmentController extends AbstractController
         Request $request,
         EntityManagerInterface $em,
         AssignmentRepository $assignmentRepository,
+        ValidatorInterface $validator,
         int $shiftId
     ): Response {
         $submittedData = $request->getPayload();
@@ -120,8 +121,21 @@ final class AssignmentController extends AbstractController
 
         $updatedCount = 0;
         foreach ($assignmentsToUpdate as $assignment) {
-            if ($assignment->getShift()?->getId() == $shiftId) {
+            if ($assignment->getShift()?->getId() === $shiftId) {
                 $assignment->setStatus($newStatus);
+
+                $violations = $validator->validate($assignment, [
+                    new AssignmentApprovalLimit()
+                ]);
+
+
+                if (count($violations) > 0) {
+                    foreach ($violations as $violation) {
+                        $this->addFlash('danger', $violation->getMessage());
+                    }
+                    return $this->redirectToRoute('admin_shift_manage', ['id' => $shiftId]);
+                }
+
                 $updatedCount++;
             } else {
                 $this->addFlash('warning', sprintf('Assignment ID %d does not belong to this shift and was skipped.', $assignment->getId()));
