@@ -58,7 +58,6 @@ final class ShiftController extends AbstractController
         return new JsonResponse($events);
     }
 
-    // csrf token check
     #[IsGranted('ROLE_USER')]
     #[Route('/shifts/{id}/apply', name: 'assignment_shift_apply', methods: ['POST'])]
     public function apply(

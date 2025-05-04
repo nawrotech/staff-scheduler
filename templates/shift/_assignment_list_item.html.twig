@@ -1,27 +1,25 @@
-<li class="list-group-item d-flex justify-content-between align-items-center">
-    <div class="d-flex align-items-center">
-        
-        <input type="checkbox" 
-               name="assignment_ids[]" 
-               value="{{ assignment.id }}" 
-               form="bulk-action-form" 
-               class="form-check-input me-2" 
-               aria-label="Select assignment {{ assignment.id }}">
-        
-        <div>
-            {% if assignment.staffProfile %}
-                <span class="fw-bold">{{ assignment.staffProfile.name }}</span>
-                <span>{{ assignment.staffProfile.position.value }}</span>
-            {% else %}
-                <span class="text-muted fst-italic">Unassigned</span>
-            {% endif %}
+<li class="list-group-item">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+        <div class="mb-2 mb-md-0">
+            <div class="d-flex align-items-center">
+                <div class="form-check me-2">
+                    <input class="form-check-input assignment-checkbox" type="checkbox" name="assignment_ids[]" value="{{ assignment.id }}" id="assignment-{{ assignment.id }}" form="bulk-action-form">
+                    <label class="form-check-label" for="assignment-{{ assignment.id }}">
+                        <strong>{{ assignment.staffProfile.name }}</strong>
+                    </label>
+                </div>
+                <div class="text-muted small">
+                    <span class="badge bg-{{ assignment.status.value }}">{{ assignment.status.value }}</span>
+                    {% if assignment.shiftPosition.name.value %}
+                        <span class="ms-1">• {{ assignment.shiftPosition.name.value }}</span>
+                    {% endif %}
+                </div>
+            </div>
         </div>
-    </div>
-    
-
-    <div class="d-flex align-items-center">
-        {{ include('shift/_update_assignment_status_form.html.twig') }}
-
-        {{ include('shift/_delete_assignment_form.html.twig') }}
+        
+        <div class="d-flex flex-column flex-sm-row gap-2 mt-2 mt-md-0">
+            {{ include('shift/_update_assignment_status_form.html.twig') }}
+            {{ include('shift/_delete_assignment_form.html.twig') }}
+        </div>
     </div>
 </li>

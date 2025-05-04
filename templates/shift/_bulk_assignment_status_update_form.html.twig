@@ -5,9 +5,7 @@
     <input type="hidden" name="token" value="{{ csrf_token('bulk-update-status') }}">
     <div class="row g-2 align-items-end">
     <div class="col-auto">
-        <label for="bulk_status" class="form-label">Bulk Action:</label>
-        {% set assignmentStatuses = enum('App\\Enum\\AssignmentStatus').cases() %}
-        
+        <label for="bulk_status" class="form-label">Bulk Action:</label>        
         {{ include('partials/_select.html.twig', {
             name: 'bulk_status',
             options:  enum('App\\Enum\\AssignmentStatus').cases(),

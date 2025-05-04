@@ -13,6 +13,9 @@
         <div id="assignment-list-container" class="mt-3"> 
             {% for positionName, assignmentsInPosition in assignmentsByPosition %}
                 <div class="card shadow-sm mb-3">
+                    <div class="card-header bg-light">
+                        <strong>{{ positionName }}</strong>
+                    </div>
                     <ul class="list-group list-group-flush">
                         {% for assignment in assignmentsInPosition %}
                             {{ include('shift/_assignment_list_item.html.twig') }}

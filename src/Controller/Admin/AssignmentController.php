@@ -17,21 +17,9 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 final class AssignmentController extends AbstractController
 {
-    #[Route('/assignment/check/fucking/{id}', name: 'app_assignment')]
-    public function index(
-        Assignment $assignment,
-        EntityManagerInterface $em
-    ): Response {
-
-        // dd($assignment);
-
-        $assignment->setStatus(AssignmentStatus::PENDING);
-
-        $uow = $em->getUnitOfWork();
-        $originalData = $uow->getOriginalEntityData($assignment);
-
-        dd($assignment, $originalData['status']);
-
+    #[Route('/assignment/check/{id}', name: 'app_assignment')]
+    public function index(): Response
+    {
 
         return $this->render('assignment/index.html.twig', [
             'controller_name' => 'AssignmentController',
