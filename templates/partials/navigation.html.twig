@@ -1,7 +1,31 @@
-<nav>
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
     <div class="container">
-        <ul>
-            
+      <a class="navbar-brand" href="/">Staff Scheduler</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavDropdown">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link active"  href="#">Your shifts</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link active" href="{{ path('shift_create') }}">Create shift</a>
+          </li>
+       
+          {% if is_granted('ROLE_ADMIN')  %}
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Admin actions
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="{{ path('shift_create') }}">Create shift</a></li>
+                </ul>
+            </li>
+          {% endif %}
+          
         </ul>
+      </div>
     </div>
-</nav>
+  </nav>

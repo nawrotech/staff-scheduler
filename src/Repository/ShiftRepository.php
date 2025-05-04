@@ -16,28 +16,23 @@ class ShiftRepository extends ServiceEntityRepository
         parent::__construct($registry, Shift::class);
     }
 
-    //    /**
-    //     * @return Shift[] Returns an array of Shift objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('s')
-    //            ->andWhere('s.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('s.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Shift
-    //    {
-    //        return $this->createQueryBuilder('s')
-    //            ->andWhere('s.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    /**
+     * Find shifts within a date range
+     * 
+     * @param \DateTimeInterface $startDate
+     * @param \DateTimeInterface $endDate
+     * @return Shift[]
+     */
+    public function findInDateRange(\DateTimeInterface $startDate, \DateTimeInterface $endDate): array
+    {
+        return $this->createQueryBuilder('s')
+            ->where('s.date >= :startDate')
+            ->andWhere('s.date <= :endDate')
+            ->setParameter('startDate', $startDate)
+            ->setParameter('endDate', $endDate)
+            ->orderBy('s.date', 'ASC')
+            ->addOrderBy('s.startTime', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }

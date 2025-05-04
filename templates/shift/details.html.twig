@@ -143,9 +143,9 @@
             {% if is_granted('ROLE_ADMIN') %}
                 <a class="btn btn-success" href="{{ path('shift_create', {id: shift.id}) }}">Edit</a>
 
-         
-                <button class="btn btn-danger">Delete</button>
-               
+                <a class="btn btn-secondary" href="{{ path('admin_shift_manage', {id: shift.id}) }}" >Manage assignments</a>
+
+                <button class="btn btn-danger">Delete</button>               
             {% endif %}
         </div>
     </div>

@@ -6,19 +6,12 @@
 <div class="container">
     <h1 class="my-4">Shift Calendar</h1>
 
-     {% if is_granted('ROLE_ADMIN') %}
-        <a class="btn btn-primary" href="{{ path('shift_create') }}">Schedule Shift</a>
-     {% endif %}
-     
-
     <div {{ stimulus_controller('calendar', {
-        shiftsUrl: path('api_shifts'),
-        shiftShowUrl: url('shift_show')
+        shiftsUrl: path('api_calendar_shifts_data'),
+        shiftDetailsUrl: url('shift_details')
         }) }}>
         <div {{ stimulus_target('calendar', 'calendarElement') }}></div>
     </div>
-
-   
 
 </div>
 {% endblock %}

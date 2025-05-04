@@ -9,7 +9,7 @@ export default class extends Controller {
 
     static values = {
         shiftsUrl: String,
-        shiftShowUrl: String
+        shiftDetailsUrl: String
     }
 
     calendar = null;
@@ -36,7 +36,7 @@ export default class extends Controller {
                 let anchor = info.el;
                 const shiftId = info.event.id;
                 if (anchor) {
-                    anchor.href = `${this.shiftShowUrlValue}/${shiftId}`; 
+                    anchor.href = `${this.shiftDetailsUrlValue}/${shiftId}`; 
                 }
               },
             editable: true,

@@ -3,7 +3,6 @@
 namespace App\Service;
 
 use App\Entity\Assignment;
-use App\Enum\AssignmentStatus;
 use App\Message\AssignmentCancelledMessage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
