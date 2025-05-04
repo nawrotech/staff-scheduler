@@ -25,8 +25,7 @@ framework:
             Symfony\Component\Notifier\Message\ChatMessage: async
             Symfony\Component\Notifier\Message\SmsMessage: async
             Symfony\Component\Notifier\Message\EmailMessage: async  
-            App\Message\ShiftFulfilledMessage: async
-            App\Message\ShiftUpdatedMessage: async
+            App\Message\AssignmentCancelledMessage: async
 
             # Route your messages to the transports
             # 'App\Message\YourMessage': async

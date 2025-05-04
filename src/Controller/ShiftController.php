@@ -32,16 +32,10 @@ final class ShiftController extends AbstractController
     ) {}
 
 
-    #[Route('/', name: 'shift_index')]
-    public function index(): Response
+    #[Route('/', name: 'shift_calendar', methods: ['GET'])]
+    public function calendar(ShiftRepository $shiftRepository): Response
     {
-        // $shifts = $this->isGranted('ROLE_ADMIN') 
-        //     ? $this->shiftRepository->findAll() 
-        //     : $this->shiftRepository->findBy(['staff' => $this->getUser()]);
-
-        return $this->render('shift/index.html.twig', [
-            'controller_name' => 'ShiftController',
-        ]);
+        return $this->render('shift/calendar.html.twig', []);
     }
 
 
@@ -115,13 +109,6 @@ final class ShiftController extends AbstractController
     }
 
 
-
-    #[Route('shifts/calendar', name: 'shift_calendar', methods: ['GET'])]
-    public function calendar(ShiftRepository $shiftRepository): Response
-    {
-        return $this->render('shift/calendar.html.twig', []);
-    }
-
     #[IsGranted('ROLE_ADMIN')]
     #[Route('shifts/create/{id?}', name: 'shift_create', methods: ['GET', 'POST'])]
     public function create(
@@ -153,13 +140,29 @@ final class ShiftController extends AbstractController
     #[Route('shifts/{id?}', name: "shift_show")]
     public function showShift(
         Shift $shift,
-        UserRepository $userRepository
+        AssignmentRepository $assignmentRepository,
+        #[CurrentUser()] User $user
     ): Response {
 
-        // dd($userRepository->findByRole('ROLE_USER'));
+        $existingAssignments = [];
+
+        if ($user && $user->getStaffProfile()) {
+            $existingAssignments = $assignmentRepository->findBy([
+                'shift' => $shift,
+                'staffProfile' => $user->getStaffProfile()
+            ]);
+
+            $existingAssignments = array_reduce($existingAssignments, function ($result, $assignment) {
+                $result[$assignment->getShiftPosition()->getId()] = $assignment;
+                return $result;
+            }, []);
+        }
+
+
 
         return $this->render('shift/details.html.twig', [
-            'shift' => $shift
+            'shift' => $shift,
+            'existingAssignments' => $existingAssignments
         ]);
     }
 
