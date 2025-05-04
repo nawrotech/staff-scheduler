@@ -7,8 +7,10 @@ use App\Entity\Shift;
 use App\Entity\User;
 use App\Repository\AssignmentRepository;
 use App\Repository\ShiftRepository;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Clock\ClockInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -34,10 +36,10 @@ final class ShiftController extends AbstractController
 
     #[Route('/api/calendar-data', name: 'api_calendar_shifts_data', methods: ['GET'])]
     public function getCalendarData(
-        ShiftRepository $shiftRepository
+        ShiftRepository $shiftRepository,
     ): JsonResponse {
 
-        $today = new \DateTimeImmutable();
+        $today = new DateTimeImmutable();
         $oneWeekAgo = $today->modify('-1 week');
         $oneMonthAhead = $today->modify('+1 month');
 

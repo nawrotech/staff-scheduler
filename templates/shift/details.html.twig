@@ -120,7 +120,7 @@
             </div>
             
             {% if shift.assignments|length > 0 %}
-                <div class="card shadow-sm border-0 mt-4">
+                <div class="card shadow-sm border-0 my-4">
                     <div class="card-header bg-white">
                         <h5 class="mb-0">Staff Assignments</h5>
                     </div>
@@ -141,11 +141,19 @@
 
 
             {% if is_granted('ROLE_ADMIN') %}
-                <a class="btn btn-success" href="{{ path('shift_create', {id: shift.id}) }}">Edit</a>
+                <div class="d-flex flex-wrap gap-2 my-4">
+                    <a class="btn btn-success" href="{{ path('shift_create', {id: shift.id}) }}">Edit</a>
 
-                <a class="btn btn-secondary" href="{{ path('admin_shift_manage', {id: shift.id}) }}" >Manage assignments</a>
-
-                <button class="btn btn-danger">Delete</button>               
+                    <a class="btn btn-secondary" href="{{ path('shift_manage', {id: shift.id}) }}" >Manage assignments</a>
+    
+                   <form method="POST" action="{{ path('shift_delete', {'id': shift.id}) }}" 
+                            onsubmit="return confirm('Are you sure you want to delete this shift? This will also remove all assignments for this shift.');">
+                            <input type="hidden" name="token" value="{{ csrf_token('delete-shift-' ~ shift.id) }}">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash"></i> Delete Shift
+                            </button>
+                    </form> 
+                </div>
             {% endif %}
         </div>
     </div>

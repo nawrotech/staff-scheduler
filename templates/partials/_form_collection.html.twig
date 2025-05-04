@@ -7,8 +7,7 @@
     <ul {{ stimulus_target('form-collection', 'collectionContainer') }}>
             {% for formField in collectionType %}
                 <li class="{{ wrapperClassName }}">
-                    {# {{ form(formField) }} #}
-                    {{form_row(formField)}}
+                    {{form_widget(formField)}}
                 </li>
             {% endfor %}
     </ul>
